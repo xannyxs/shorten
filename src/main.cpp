@@ -22,7 +22,7 @@ int32_t main(int32_t argc, char *argv[]) {
 						std::cout << entry.path() << "\n";
 
 						checkFile(entry.path());
-						uploadToLivepeer(entry.path());
+						callPythonScript(entry.path());
 					}
 				}
 				catch (std::runtime_error& err) {
@@ -34,7 +34,7 @@ int32_t main(int32_t argc, char *argv[]) {
 			std::cout << "Given path is a file\n";
 
 			checkFile(argv[1]);
-			uploadToLivepeer(argv[1]);
+			callPythonScript(argv[1]);
 		}
 	}
 	catch (std::exception& err) {
@@ -44,5 +44,7 @@ int32_t main(int32_t argc, char *argv[]) {
 		std::cerr << "A fatal error happenend\n";
 		exit(1);
 	}
+
+	std::cout << "Successfully completed program..." << std::endl;
 	return 0;
 }

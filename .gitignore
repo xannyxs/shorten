@@ -1,7 +1,14 @@
+# Python
+__pycache__
+
 # Misrc
 .DS_Store
 cmake-build-debug
+cmake-build
+lib/
 .idea
+.env.local
+credentials.json
 
 # Prerequisites
 *.d

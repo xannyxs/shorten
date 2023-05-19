@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.18)
 project(shorten)
 
-set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -pedantic")
 
 set(SOURCE_FILES
@@ -20,23 +20,16 @@ if (NOT MAGIC_INCLUDE_DIR)
     message(FATAL_ERROR "magic.h not found")
 endif()
 
-# specify the path to your venv
-set(PYTHON_VENV_PATH "${CMAKE_SOURCE_DIR}/.venv")
-
-# find the Python interpreter and libraries in the venv
-set(Python3_ROOT_DIR "${PYTHON_VENV_PATH}")
-find_package(Python3 COMPONENTS Interpreter Development REQUIRED)
-
 # add the Python include directories to your include path
-include_directories(${MAGIC_INCLUDE_DIR} ${Python3_INCLUDE_DIRS})
+include_directories(${MAGIC_INCLUDE_DIR})
 
 # MAIN PROGRAM
 add_executable(shorten ${SOURCE_FILES})
 target_include_directories(shorten PRIVATE include)
-target_link_libraries(shorten ${MAGIC_LIB} Python3::Python)
+target_link_libraries(shorten ${MAGIC_LIB})
 
 # TESTER
 add_subdirectory(lib/Catch2)
 add_executable(tester ${TEST_FILES})
-target_link_libraries(tester PRIVATE Catch2::Catch2WithMain ${MAGIC_LIB} Python3::Python)
+target_link_libraries(tester PRIVATE ${MAGIC_LIB} Catch2::Catch2WithMain)
 target_include_directories(tester PRIVATE include)

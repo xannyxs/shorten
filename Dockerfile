@@ -2,9 +2,6 @@ FROM python:3.9.9-slim-bullseye
 
 WORKDIR /shorten
 
-ARG LIVEPEER_API_KEY
-ENV LIVEPEER_API_KEY=$LIVEPEER_API_KEY
-
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     clang \
@@ -37,5 +34,3 @@ RUN pip install --upgrade pip && \
 
 RUN cmake -S . -B cmake-build && \
     cmake --build cmake-build
-
-CMD tail -f /dev/null

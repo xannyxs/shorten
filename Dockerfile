@@ -1,4 +1,4 @@
-FROM python:3.9.9-slim-bullseye
+FROM arm64v8/python:3.9.9-slim-bullseye
 
 WORKDIR /shorten
 
@@ -34,3 +34,5 @@ RUN pip install --upgrade pip && \
 
 RUN cmake -S . -B cmake-build && \
     cmake --build cmake-build
+
+CMD tail -f /dev/null

@@ -7,6 +7,6 @@
 
 #include <string>
 
-void callPythonScript(const std::string&);
+void callPythonScript(const std::filesystem::path&, const std::string&);
 
 #endif //SHORTEN_VIDEOUPLOADING_HPP

@@ -4,8 +4,13 @@ project(shorten)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Werror -pedantic")
 
+find_package(CURL REQUIRED)
+if(NOT CURL_FOUND)
+    message(FATAL_ERROR "CURL library not found.")
+endif()
+
 set(SOURCE_FILES
-        src/main.cpp src/videoFormatting.cpp src/utils.cpp src/uploadVideo.cpp)
+        src/main.cpp src/videoFormatting.cpp src/utils.cpp src/uploadVideo.cpp src/Livepeer/livepeer.cpp)
 
 set(TEST_FILES
         src/videoFormatting.cpp tests/videoFormatting_tests.cpp src/uploadVideo.cpp)
@@ -25,8 +30,8 @@ include_directories(${MAGIC_INCLUDE_DIR})
 
 # MAIN PROGRAM
 add_executable(shorten ${SOURCE_FILES})
-target_include_directories(shorten PRIVATE include)
-target_link_libraries(shorten ${MAGIC_LIB})
+target_include_directories(shorten PRIVATE include ${CURL_INCLUDE_DIR})
+target_link_libraries(shorten ${MAGIC_LIB} ${CURL_LIBRARIES})
 
 # TESTER
 add_subdirectory(lib/Catch2)

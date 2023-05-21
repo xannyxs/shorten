@@ -11,21 +11,21 @@
 
 using json = nlohmann::json;
 
-std::string videoIsProcessed(Livepeer livpeer, const std::string& assetID) {
+constexpr int32_t MAX_TIMEOUT = 600;
+constexpr int32_t SLEEP_INTERVAL = 20;
+
+std::string videoIsProcessed(Livepeer& livepeer, const std::string& assetID) {
 	json asset;
-	int32_t max_timeout = 600;
-	int32_t sleep_interval = 20;
 	int32_t elapsed_time = 0;
 
-	while (elapsed_time < max_timeout) {
+	while (elapsed_time < MAX_TIMEOUT) {
 		std::cout << "Waiting for 'playbackUrl' to be available...\n";
-		 asset = livpeer.retrieveAsset(assetID);
-		 if (!asset["playbackUrl"].is_null()) {
-			 break ;
-		 }
-
-		std::this_thread::sleep_for(std::chrono::seconds(sleep_interval));
-		elapsed_time += sleep_interval;
+		asset = livepeer.retrieveAsset(assetID);
+		if (!asset["playbackUrl"].is_null()) {
+			break;
+		}
+		std::this_thread::sleep_for(std::chrono::seconds(SLEEP_INTERVAL));
+		elapsed_time += SLEEP_INTERVAL;
 	}
 
 	if (asset["playbackUrl"].is_null()) {
@@ -35,6 +35,19 @@ std::string videoIsProcessed(Livepeer livpeer, const std::string& assetID) {
 	return asset["playbackUrl"];
 }
 
+void processFile(Livepeer& livepeer, const std::filesystem::path& videoPath) {
+	std::cout << videoPath << "\n";
+
+	checkFile(videoPath);
+	json jsonObj = livepeer.getLivepeerUrl(videoPath.filename());
+
+	std::cout << "Uploading file to Livepeer...\n";
+	livepeer.uploadContent(videoPath, jsonObj["url"]);
+
+	const std::string playbackUrl = videoIsProcessed(livepeer, jsonObj["asset"]["id"]);
+	callPythonScript(videoPath, playbackUrl);
+}
+
 int32_t main(int32_t argc, char *argv[]) {
 	if (argc != 2) {
 		std::cerr << "Program needs an argument\n";
@@ -42,54 +55,30 @@ int32_t main(int32_t argc, char *argv[]) {
 	}
 
 	try {
-		if (isDirectory(argv[1])) {
+		Livepeer livepeer;
+		std::filesystem::path path(argv[1]);
+
+		if (isDirectory(path)) {
 			std::cout << "Given path is a directory\n";
-			std::filesystem::path dirPath = argv[1];
 
-			for (const auto& entry : std::filesystem::directory_iterator(dirPath)) {
-				try {
-					if (std::filesystem::is_regular_file(entry)) {
-						Livepeer livepeer;
-						std::cout << entry.path() << "\n";
-
-						checkFile(entry.path());
-
-						const std::string& assetUrl = livepeer.getLivepeerUrl(entry.path().filename());
-						json jsonObj = json::parse(assetUrl);
-
-						std::cout << "Uploading file to Livepeer...\n";
-						livepeer.uploadContent(entry.path(), jsonObj["url"]);
-
-						callPythonScript(entry.path(), jsonObj["id"]);
-					}
-				}
-				catch (std::runtime_error& err) {
-					std::cerr << err.what() << std::endl;
+			for (const auto& entry : std::filesystem::directory_iterator(path)) {
+				if (std::filesystem::is_regular_file(entry)) {
+					processFile(livepeer, entry.path());
 				}
 			}
 		}
 		else {
-			Livepeer livepeer;
-			std::filesystem::path videoPath(argv[1]);
 			std::cout << "Given path is a file\n";
-
-			checkFile(argv[1]);
-			json jsonObj = livepeer.getLivepeerUrl(videoPath.filename());
-
-			std::cout << "Uploading file to Livepeer...\n";
-			livepeer.uploadContent(videoPath, jsonObj["url"]);
-
-			const std::string playbackUrl = videoIsProcessed(livepeer, jsonObj["asset"]["id"]);
-			callPythonScript(videoPath, playbackUrl);
+			processFile(livepeer, path);
 		}
 	}
 	catch (std::exception& err) {
 		std::cerr << err.what() << std::endl;
-		exit(1);
+		return 1;
 	}
 	catch (...) {
 		std::cerr << "A fatal error happened\n";
-		exit(1);
+		return 1;
 	}
 
 	std::cout << "Successfully completed program..." << std::endl;

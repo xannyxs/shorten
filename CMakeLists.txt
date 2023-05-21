@@ -10,7 +10,7 @@ if(NOT CURL_FOUND)
 endif()
 
 set(SOURCE_FILES
-        src/main.cpp src/videoFormatting.cpp src/utils.cpp src/uploadVideo.cpp src/Livepeer/livepeer.cpp)
+        src/main.cpp src/videoFormatting.cpp src/utils.cpp src/uploadVideo.cpp src/Livepeer/Livepeer.cpp)
 
 set(TEST_FILES
         src/videoFormatting.cpp tests/videoFormatting_tests.cpp src/uploadVideo.cpp)

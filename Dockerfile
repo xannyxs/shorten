@@ -11,6 +11,8 @@ RUN apt-get update && \
     libmagic-dev \
     cmake \
     ffmpeg \
+    curl \
+    libcurl4-openssl-dev \
     bash && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*

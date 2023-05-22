@@ -9,10 +9,10 @@ if(NOT CURL_FOUND)
 endif()
 
 set(SOURCE_FILES
-        src/main.cpp src/videoFormatting.cpp src/utils.cpp src/uploadVideo.cpp src/Livepeer/Livepeer.cpp)
+        src/main.cpp src/videoFormatting.cpp src/utils.cpp src/uploadVideo.cpp src/Livepeer/Livepeer.cpp src/videoProcessing.cpp)
 
 set(TEST_FILES
-        src/videoFormatting.cpp tests/videoFormatting_tests.cpp src/uploadVideo.cpp tests/LivepeerTests.cpp src/Livepeer/Livepeer.cpp)
+        src/videoFormatting.cpp tests/videoFormattingTests.cpp src/uploadVideo.cpp tests/LivepeerTests.cpp src/Livepeer/Livepeer.cpp tests/videoProcessingTests.cpp src/utils.cpp src/videoProcessing.cpp)
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_definitions(DEBUG=1)
@@ -32,8 +32,8 @@ endif()
 
 # MAIN PROGRAM
 add_executable(shorten ${SOURCE_FILES})
-target_include_directories(shorten PRIVATE include ${CURL_INCLUDE_DIR} ${MAGIC_INCLUDE_DIR})
 target_link_libraries(shorten ${MAGIC_LIB} ${CURL_LIBRARIES})
+target_include_directories(shorten PRIVATE include src/Livepeer ${CURL_INCLUDE_DIR} ${MAGIC_INCLUDE_DIR})
 target_compile_options(shorten PRIVATE -Wall -Wextra -Werror -pedantic)
 
 # TESTER

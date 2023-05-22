@@ -5,7 +5,7 @@
 #include <string>
 #include <filesystem>
 
-bool isDirectory(const std::string& givenPath) {
+inline bool isDirectory(const std::string& givenPath) {
 	std::filesystem::path path = givenPath;
 
 	return is_directory(path);

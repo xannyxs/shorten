@@ -9,6 +9,8 @@
 #define RETRIEVE_ASSET "https://livepeer.com/api/asset/"
 #define EXPORT_ASSET "https://livepeer.com/api/asset/" // ENDS WITH $ASSET_ID/export
 
+using json = nlohmann::json;
+
 class Livepeer {
 public:
 	Livepeer() {
@@ -28,9 +30,9 @@ public:
 	}
 
 	void uploadContent(const std::string& filePath, const std::string& assetURL);
-	nlohmann::json exportAssetToIPFS(const std::string& assetID);
-	nlohmann::json retrieveAsset(const std::string& assetID);
-	nlohmann::json getLivepeerUrl(const std::string& videoName);
+	json exportAssetToIPFS(const std::string& assetID);
+	json retrieveAsset(const std::string& assetID);
+	json getLivepeerUrl(const std::string& videoName);
 
 private:
 	std::string APIKEY;

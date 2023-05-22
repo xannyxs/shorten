@@ -18,7 +18,7 @@ TEST_CASE("Testing Livepeer class") {
 	}
 
 	SECTION("Retrieve asset") {
-		nlohmann::json response = livepeer.retrieveAsset(ASSETID);
+		json response = livepeer.retrieveAsset(ASSETID);
 
 		REQUIRE(response.contains("id"));
 		REQUIRE(response["id"] == ASSETID);
@@ -33,7 +33,7 @@ TEST_CASE("Testing Livepeer class") {
 
 	SECTION("Get Livepeer URL") {
 		std::string videoName = "testVideo";
-		nlohmann::json response = livepeer.getLivepeerUrl(videoName);
+		json response = livepeer.getLivepeerUrl(videoName);
 
 		REQUIRE(response.contains("url"));
 		REQUIRE(response["url"].is_string());

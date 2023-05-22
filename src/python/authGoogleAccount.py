@@ -2,9 +2,10 @@ import gspread
 from google.oauth2.service_account import Credentials
 from googleapiclient import discovery
 from gspread import Client, Spreadsheet, Worksheet
+from typing import Any, Optional
 
 
-def login_drive() -> any:
+def login_drive() -> Optional[Any]:
     creds = Credentials.from_service_account_file("credentials.json")
     return discovery.build('drive', 'v3', credentials=creds)
 

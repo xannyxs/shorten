@@ -2,6 +2,8 @@ import argparse
 import os
 import sys
 import subprocess
+from typing import Any
+
 import whisper
 import openai
 
@@ -23,7 +25,7 @@ def process_text_file(transcribed_text: str) -> str:
 def summarize_text(input_text: str, output_file: str) -> None:
     openai.api_key = os.environ.get('CHATGPT_API_KEY')
 
-    response = openai.ChatCompletion.create(
+    response = openai.ChatCompletion.create( # type: ignore
         model="gpt-3.5-turbo",
         messages=[
             {"role": "user", "content": f"Summarize this for a description for a video:\n\n{input_text}"}
@@ -62,7 +64,7 @@ def download_m3u8_video_as_wav(m3u8_url: str, output_name: str) -> None:
         print(f"Error occurred while downloading and converting audio from {m3u8_url} to {output_name}.wav: {e}")
 
 
-def convert_speech_to_text(input_wav: str) -> any:
+def convert_speech_to_text(input_wav: str) -> Any:
     model = whisper.load_model("base")
     result = model.transcribe(input_wav)
     text = result["text"]

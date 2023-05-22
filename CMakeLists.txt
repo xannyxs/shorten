@@ -38,8 +38,7 @@ target_compile_options(shorten PRIVATE -Wall -Wextra -Werror -pedantic)
 
 # TESTER
 add_subdirectory(lib/Catch2)
-add_subdirectory(lib/trompeloeil)
 add_executable(tester ${TEST_FILES})
-target_link_libraries(tester PRIVATE ${MAGIC_LIB} Catch2::Catch2WithMain trompeloeil ${CURL_LIBRARIES})
+target_link_libraries(tester PRIVATE ${MAGIC_LIB} Catch2::Catch2WithMain ${CURL_LIBRARIES})
 target_include_directories(tester PRIVATE include src/Livepeer ${MAGIC_INCLUDE_DIR})
 target_compile_options(tester PRIVATE -Wall -Wextra -Werror -pedantic)

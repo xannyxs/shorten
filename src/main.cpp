@@ -9,6 +9,16 @@ int32_t main(int32_t argc, char *argv[]) {
 		return 1;
 	}
 
+	if (!std::filesystem::exists("/shorten/credentials")) {
+		std::cerr << "Credentials file does not exist.\n";
+		return 1;
+	}
+
+	if (!std::filesystem::exists("/shorten/.env.local")) {
+		std::cerr << ".env.local file does not exist.\n";
+		return 1;
+	}
+
 	try {
 		Livepeer livepeer;
 		std::filesystem::path path(argv[1]);

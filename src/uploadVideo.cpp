@@ -20,9 +20,8 @@ inline std::string getExecutablePath() {
 	return execPath;
 }
 
-
 void callPythonScript(const std::filesystem::path& videoPath, const std::string& assetId) {
-	std::string scriptPath = "../src/python/transcodeVideo.py";
+	std::string scriptPath = "/shorten/src/python/transcodeVideo.py";
 
 	std::stringstream command;
 	command << "python3 " << scriptPath << " " << videoPath << " " << assetId;

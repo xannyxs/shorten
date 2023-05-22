@@ -7,4 +7,4 @@ services:
     env_file:
       - .env.local
     volumes:
-      - home/xander/FTP:/shorten/videosToUpload
+      - /home/xander/FTP:/shorten/videosToUpload

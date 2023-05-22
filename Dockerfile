@@ -13,11 +13,12 @@ RUN apt-get update && \
     ffmpeg \
     curl \
     libcurl4-openssl-dev \
+    cron \
     bash && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Use clang if available, otherwise use gcc
+# Use clang if available, otherwise use gcc. (Using slim-bullseye for clang++)
 RUN if [ -x "$(command -v clang)" ]; then \
         export CC=clang; \
         export CXX=clang++; \
@@ -28,6 +29,11 @@ RUN if [ -x "$(command -v clang)" ]; then \
 
 COPY . /shorten
 
+RUN mkdir /shorten/videosToUpload
+COPY ./scripts/crontab /etc/cron.d/crontab
+RUN chmod 0644 /etc/cron.d/crontab && \
+    crontab /etc/cron.d/crontab
+
 # CMake cannot find libmagic without link
 RUN ln -s /usr/lib/x86_64-linux-gnu/libmagic.so /usr/lib/libmagic.so
 
@@ -37,4 +43,4 @@ RUN pip install --upgrade pip && \
 RUN cmake -S . -B cmake-build && \
     cmake --build cmake-build
 
-CMD tail -f /dev/null
+ENTRYPOINT ["cron", "-f"]

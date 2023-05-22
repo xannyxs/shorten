@@ -3,6 +3,8 @@ project(shorten)
 
 set(CMAKE_CXX_STANDARD 20)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 find_package(CURL REQUIRED)
 if(NOT CURL_FOUND)
     message(FATAL_ERROR "CURL library not found.")

@@ -1,7 +1,6 @@
 #include <iostream>
 #include <filesystem>
 
-#include "videoUploading.hpp"
 #include "videoProcessing.hpp"
 
 int32_t main(int32_t argc, char *argv[]) {
@@ -14,7 +13,7 @@ int32_t main(int32_t argc, char *argv[]) {
 		Livepeer livepeer;
 		std::filesystem::path path(argv[1]);
 
-		if (isDirectory(path)) {
+		if (is_directory(path)) {
 			std::cout << "Given path is a directory\n";
 
 			for (const auto& entry : std::filesystem::directory_iterator(path)) {

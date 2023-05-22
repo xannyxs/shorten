@@ -41,6 +41,10 @@ void processFile(Livepeer& livepeer, const std::filesystem::path& videoPath) {
 	checkFile(videoPath);
 	json jsonObj = livepeer.getLivepeerUrl(videoPath.filename());
 
+	if (jsonObj["url"].is_null()) {
+		throw std::runtime_error("URL from getLivepeerUrl is null");
+	}
+
 	std::cout << "Uploading file to Livepeer...\n";
 	livepeer.uploadContent(videoPath, jsonObj["url"]);
 

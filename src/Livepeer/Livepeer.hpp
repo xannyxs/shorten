@@ -27,8 +27,8 @@ public:
 		curl_global_cleanup();
 	}
 
-	std::string exportAssetToIPFS(const std::string& assetID);
 	void uploadContent(const std::string& filePath, const std::string& assetURL);
+	nlohmann::json exportAssetToIPFS(const std::string& assetID);
 	nlohmann::json retrieveAsset(const std::string& assetID);
 	nlohmann::json getLivepeerUrl(const std::string& videoName);
 

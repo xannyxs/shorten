@@ -4,12 +4,16 @@ __pycache__
 
 # Misrc
 .DS_Store
-cmake-build-debug
-cmake-build
 lib/
 .idea
 .env.local
 credentials.json
+.ccls-cache
+
+# CMake
+cmake-build-debug
+cmake-build-release
+cmake-build
 
 # Prerequisites
 *.d

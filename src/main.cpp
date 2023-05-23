@@ -9,7 +9,7 @@ int32_t main(int32_t argc, char *argv[]) {
 		return 1;
 	}
 
-	if (!std::filesystem::exists("/shorten/credentials")) {
+	if (!std::filesystem::exists("/shorten/credentials.json")) {
 		std::cerr << "Credentials file does not exist.\n";
 		return 1;
 	}

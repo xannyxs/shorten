@@ -32,6 +32,8 @@ if (NOT MAGIC_INCLUDE_DIR)
     message(FATAL_ERROR "magic.h not found")
 endif()
 
+enable_testing()
+
 # MAIN PROGRAM
 add_executable(shorten ${SOURCE_FILES})
 target_link_libraries(shorten ${MAGIC_LIB} ${CURL_LIBRARIES})
@@ -44,3 +46,5 @@ add_executable(tester ${TEST_FILES})
 target_link_libraries(tester PRIVATE ${MAGIC_LIB} Catch2::Catch2WithMain ${CURL_LIBRARIES})
 target_include_directories(tester PRIVATE include src/Livepeer ${MAGIC_INCLUDE_DIR})
 target_compile_options(tester PRIVATE -Wall -Wextra -Werror -pedantic)
+
+add_test(NAME tester COMMAND tester)

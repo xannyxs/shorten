@@ -2,8 +2,8 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub(crate) struct Asset {
-    pub(crate) id: String,
-    playbackId: String,
+    pub id: String,
+    pub playbackId: Option<String>,
     userId: String,
     createdAt: u64,
     status: Status,

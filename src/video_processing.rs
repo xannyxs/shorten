@@ -1,36 +1,55 @@
 use crate::json_deserialize;
+use crate::json_deserialize::Response;
 use crate::livepeer::Livepeer;
 use crate::upload_video::call_python_script;
 use mime_guess::from_path;
-use reqwest::{Error, Response};
-use serde_json::Value;
-use std::future::Future;
-use std::path::{Path, PathBuf};
+use reqwest::Error as ReqwestError;
+use reqwest::Response as ReqwestResponse;
+use serde_json::json;
+use std::io::Error;
+use std::path::Path;
 use std::{io, process};
-use tokio::io::AsyncReadExt;
-use tokio::time::Duration; // import tokio sleep
+use tokio::time::Duration;
 
 const MAX_TIMEOUT: i32 = 600;
 const SLEEP_INTERVAL: i32 = 20;
 
-async fn video_is_processed(livepeer: &Livepeer, asset_id: &String) -> String {
-    let mut asset = livepeer.retrieve_asset(asset_id).await;
+async fn video_is_processed(livepeer: &Livepeer, asset_id: &String) -> Result<String, Error> {
+    let mut asset: ReqwestResponse = livepeer.retrieve_asset(asset_id).await;
     let mut elapsed_time = 0;
 
     while elapsed_time < MAX_TIMEOUT {
         println!("Waiting for 'playbackUrl' to be available...");
-        asset = livepeer.retrieve_asset(asset_id).await;
-        if !asset["playbackUrl"].is_null() {
-            break;
+
+        let body = asset.text().await;
+        let parsed_body = match &body {
+            Ok(text) => match serde_json::from_str::<json_deserialize::Response>(text) {
+                Ok(data) => {
+                    println!("Asset ID: {}", data.asset.id);
+                    Ok(data)
+                }
+                Err(_) => Err("Failed to deserialize JSON"),
+            },
+            Err(e) => {
+                eprintln!("{}", e);
+                Err("Failed to get the response body")
+            }
+        };
+
+        if let Some(playback_url) = parsed_body.unwrap().asset.playbackId {
+            return Ok(playback_url);
         }
+
         tokio::time::sleep(Duration::from_secs(SLEEP_INTERVAL as u64)).await; // async sleep
         elapsed_time += SLEEP_INTERVAL;
+
+        asset = livepeer.retrieve_asset(asset_id).await;
     }
 
-    asset["playbackUrl"]
-        .as_str()
-        .map(String::from)
-        .ok_or_else(|| format!("Timed out waiting for 'playbackUrl'").into())
+    Err(std::io::Error::new(
+        io::ErrorKind::TimedOut,
+        "Request Timeout",
+    ))
 }
 
 fn is_video_file(video_path: &Path) -> bool {
@@ -79,26 +98,32 @@ pub async fn process_file(livepeer: &Livepeer, video_path: &Path) -> Result<(), 
         },
     };
 
-    let parsed_body = match &body {
+    let parsed_body = match body {
         Ok(text) => match serde_json::from_str::<json_deserialize::Response>(&text) {
-            Ok(data) => {
-                println!("Asset ID: {}", data.asset.id);
-                Ok(data)
-            }
-            Err(_) => Err("Failed to deserialize JSON"),
+            Ok(data) => Ok(data),
+            Err(_) => Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "Failed to deserialize JSON",
+            )),
         },
         Err(e) => {
             eprintln!("{}", e);
-            Err("Failed to get the response body")
+            Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "Failed to get the response body",
+            ))
         }
     };
 
-    println!("Uploading file to Livepeer...");
-    livepeer
-        .upload_content(video_path, &parsed_body.unwrap().url)
-        .await?;
+    if let Ok(parsed_body) = &parsed_body {
+        livepeer
+            .upload_content(video_path, &parsed_body.url)
+            .await
+            .expect("TODO: panic message");
 
-    let playback_url = video_is_processed(livepeer, &parsed_body.unwrap().asset.id).await;
+        let playback_url = video_is_processed(livepeer, &parsed_body.asset.id).await;
+    }
+
     // call_python_script(video_path, &playback_url)
     Ok(())
 }

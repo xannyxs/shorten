@@ -5,8 +5,8 @@ use std::fs;
 use std::path::Path;
 use std::process;
 
-mod json_deserialize;
 mod livepeer;
+mod structs;
 mod upload_video;
 mod video_processing;
 
@@ -15,18 +15,15 @@ async fn main() {
     let args: Vec<String> = env::args().collect();
 
     if args.len() != 2 {
-        eprintln!("Program needs an argument");
-        process::exit(1);
+        panic!("Program needs an argument");
     }
 
     if !Path::new("./credentials.json").exists() {
-        eprintln!("Credentials file does not exist.");
-        process::exit(1);
+        panic!("Credentials file does not exist.");
     }
 
     if !Path::new("./.env.local").exists() {
-        eprintln!(".env.local file does not exist.");
-        process::exit(1);
+        panic!(".env.local file does not exist.");
     }
 
     let livepeer = match env::var("LIVEPEER_API_KEY") {
@@ -56,14 +53,17 @@ async fn main() {
                         for entry in entries {
                             let entry = entry.unwrap();
                             if entry.metadata().unwrap().is_file() {
-                                video_processing::process_file(&livepeer, &entry.path());
+                                process_file(&livepeer, &entry.path());
                             }
                         }
                     }
                 }
             } else {
                 println!("Given path is a file");
-                process_file(&livepeer, &path).await;
+                match process_file(&livepeer, &path).await {
+                    Ok(_) => println!("Succesfully uploaded video {:?}", path),
+                    Err(e) => eprintln!("{}", e),
+                };
             }
         }
     }

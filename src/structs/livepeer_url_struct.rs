@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug)]
-pub(crate) struct Asset {
+pub struct Asset {
     pub id: String,
     pub playbackId: Option<String>,
     userId: String,
@@ -29,9 +29,9 @@ struct Task {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub(crate) struct Response {
-    pub(crate) url: String,
+pub struct Response {
+    pub url: String,
     tusEndpoint: String,
-    pub(crate) asset: Asset,
+    pub asset: Asset,
     task: Task,
 }

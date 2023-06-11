@@ -36,7 +36,7 @@ async fn main() {
 
     let path = Path::new(&args[1]);
 
-    match fs::metadata(&path) {
+    match fs::metadata(path) {
         Err(e) => {
             eprintln!("{}", e);
             process::exit(1);
@@ -53,7 +53,10 @@ async fn main() {
                         for entry in entries {
                             let entry = entry.unwrap();
                             if entry.metadata().unwrap().is_file() {
-                                process_file(&livepeer, &entry.path());
+                                match process_file(&livepeer, &entry.path()).await {
+                                    Ok(_) => println!("Succesfully uploaded video {:?}", path),
+                                    Err(e) => eprintln!("{}", e),
+                                };
                             }
                         }
                     }

@@ -1,12 +1,12 @@
 use std::io;
 use std::path::Path;
-use std::process::{exit, Command};
+use std::process::Command;
 
 pub fn call_python_script(video_path: &Path, asset_id: &str) -> io::Result<()> {
     let script_path = "/shorten/src/python/transcodeVideo.py";
 
     let output = Command::new("python3")
-        .arg(&script_path)
+        .arg(script_path)
         .arg(video_path)
         .arg(asset_id)
         .output()?;

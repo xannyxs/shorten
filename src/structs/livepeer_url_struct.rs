@@ -3,9 +3,12 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Asset {
     pub id: String,
-    pub playbackId: Option<String>,
-    userId: String,
-    createdAt: u64,
+    #[serde(rename = "playbackId")]
+    pub playback_id: Option<String>,
+    #[serde(rename = "userID")]
+    user_id: String,
+    #[serde(rename = "createdAt")]
+    created_at: u64,
     status: Status,
     name: String,
     source: Source,
@@ -14,7 +17,8 @@ pub struct Asset {
 #[derive(Serialize, Deserialize, Debug)]
 struct Status {
     phase: String,
-    updatedAt: u64,
+    #[serde(rename = "updatedAt")]
+    updated_at: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -31,7 +35,7 @@ struct Task {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Response {
     pub url: String,
-    tusEndpoint: String,
+    tusendpoint: String,
     pub asset: Asset,
     task: Task,
 }

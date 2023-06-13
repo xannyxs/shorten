@@ -1,48 +1,75 @@
-import argparse
 import os
-import sys
 import subprocess
+import sys
 from typing import Any
 
 import whisper
 import openai
 
+from utils import eprint
+from sentence_transformers import SentenceTransformer, util
+
+GPT_MODEL = "gpt-3.5-turbo-16k"
+EMBEDDING_MODEL = 'all-MiniLM-L6-v2'
+OPENAI_API_KEY = os.getenv('CHATGPT_API_KEY')
+if not OPENAI_API_KEY:
+    raise EnvironmentError("CHATGPT_API_KEY environment variable not set")
+
 
 def process_text_file(transcribed_text: str) -> str:
-    content = transcribed_text.replace('um', '').replace('uh', '').replace(',', '').replace('  ', ' ')
-
-    words = content.split()
-    word_count = len(words)
-
-    if word_count > 1700:
-        print('Content too long, will trim file')
-        words = words[:1700]
-        content = ' '.join(words)
+    replacements = ['um', 'uh', ',', '  ']
+    content = transcribed_text
+    for r in replacements:
+        content = content.replace(r, '')
 
     return content
 
 
-def summarize_text(input_text: str, output_file: str) -> None:
-    openai.api_key = os.environ.get('CHATGPT_API_KEY')
-
-    response = openai.ChatCompletion.create( # type: ignore
-        model="gpt-3.5-turbo",
+def generate_summary(input_text: str, temperature: float) -> Any:
+    response = openai.ChatCompletion.create(  # type: ignore
+        model=GPT_MODEL,
         messages=[
-            {"role": "user", "content": f"Summarize this for a description for a video:\n\n{input_text}"}
+            {
+                "role": "user",
+                "content": f"Summarize this text delimited by triple single quotes for a description for a "
+                           f"video:\n\n'''{input_text}'''"
+            }
         ],
-        temperature=0.4,
-        top_p=1.0,
-        frequency_penalty=0.0,
-        presence_penalty=0.0
+        temperature=temperature,
+        max_tokens=512,
+        frequency_penalty=0.3,
+        presence_penalty=0
     )
+    return response['choices'][0]['message']['content']
 
-    summary = response.choices[0].message["content"].strip()
-    if os.path.exists(output_file):
-        with open(output_file, 'w') as file:
-            file.write(summary)
-    else:
-        with open(output_file, 'x') as file:
-            file.write(summary)
+
+def summarize_text(input_text: str, output_file: str) -> None:
+    openai.api_key = OPENAI_API_KEY
+
+    # Generate summaries with different temperatures
+    summaries = [generate_summary(input_text, temp) for temp in [0.3, 0.5, 0.7]]
+
+    summary_input_text = "\n\n\n'''".join(summaries)
+    summary_of_summaries = generate_summary(summary_input_text, 0.4)
+
+    is_valid = check_summary_validity(input_text, summary_of_summaries)
+    if not is_valid:
+        eprint("Summary is invalid")
+        sys.exit(1)
+
+    with open(output_file, 'w') as file:
+        file.write(summary_of_summaries)
+
+
+def check_summary_validity(input_text: str, summary: str) -> bool:
+    model = SentenceTransformer(EMBEDDING_MODEL)
+
+    input_embedding = model.encode(input_text, convert_to_tensor=True)
+    summary_embedding = model.encode(summary, convert_to_tensor=True)
+
+    similarity = util.pytorch_cos_sim(input_embedding, summary_embedding)
+
+    return similarity.item() > 0.5  # type: ignore
 
 
 def download_m3u8_video_as_wav(m3u8_url: str, output_name: str) -> None:
@@ -61,7 +88,7 @@ def download_m3u8_video_as_wav(m3u8_url: str, output_name: str) -> None:
         subprocess.run(command, check=True)
         print(f"Successfully downloaded and converted audio from {m3u8_url} to {output_name}.wav")
     except subprocess.CalledProcessError as e:
-        print(f"Error occurred while downloading and converting audio from {m3u8_url} to {output_name}.wav: {e}")
+        eprint(f"Error occurred while downloading and converting audio from {m3u8_url} to {output_name}.wav: {e}")
 
 
 def convert_speech_to_text(input_wav: str) -> Any:

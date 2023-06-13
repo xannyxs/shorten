@@ -1,77 +1,61 @@
 use crate::livepeer::Livepeer;
 use crate::video_processing::process_file;
-use std::env;
-use std::fs;
+use io::Result;
 use std::path::Path;
-use std::process;
+use std::{env, io};
 
 mod livepeer;
 mod structs;
 mod upload_video;
 mod video_processing;
+use walkdir::WalkDir;
+
+fn assert_argument_count(args: &[String]) {
+    if args.len() != 2 {
+        panic!("Program needs an argument");
+    }
+}
+
+fn assert_file_exists(path: &str) {
+    if !Path::new(path).exists() {
+        panic!("{} file does not exist.", path);
+    }
+}
+
+fn get_livepeer_api_key() -> Livepeer {
+    let livepeer_key = env::var("LIVEPEER_API_KEY").expect("Cannot find LIVEPEER_API_KEY");
+    Livepeer::new(livepeer_key)
+}
+
+async fn handle_directory(livepeer: &Livepeer, root_path: &Path) -> Result<()> {
+    for entry in WalkDir::new(root_path)
+        .into_iter()
+        .filter_map(|e| e.ok()) // Handles walkdir::Error
+        .filter(|e| !e.file_type().is_dir())
+    {
+        let path = entry.path();
+        match process_file(livepeer, path).await {
+            Ok(_) => println!("Successfully uploaded video {:?}", path),
+            Err(e) => eprintln!("{}", e),
+        }
+    }
+    Ok(())
+}
 
 #[tokio::main]
 async fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() != 2 {
-        panic!("Program needs an argument");
-    }
+    assert_argument_count(&args);
+    assert_file_exists("./credentials.json");
+    assert_file_exists("./.env.local");
 
-    if !Path::new("./credentials.json").exists() {
-        panic!("Credentials file does not exist.");
-    }
-
-    if !Path::new("./.env.local").exists() {
-        panic!(".env.local file does not exist.");
-    }
-
-    let livepeer = match env::var("LIVEPEER_API_KEY") {
-        Ok(env) => Livepeer::new(env),
-        Err(_e) => {
-            println!("Cannot find LIVEPEER_API_KEY");
-            process::exit(1);
-        }
-    };
-
+    let livepeer = get_livepeer_api_key();
     let path = Path::new(&args[1]);
 
-    match fs::metadata(path) {
-        Err(e) => {
-            eprintln!("{}", e);
-            process::exit(1);
-        }
-        Ok(metadata) => {
-            if metadata.is_dir() {
-                println!("Given path is a directory");
-                match fs::read_dir(path) {
-                    Err(e) => {
-                        eprintln!("A fatal error happened: {}", e);
-                        process::exit(1);
-                    }
-                    Ok(entries) => {
-                        for entry in entries {
-                            let entry = entry.unwrap();
-                            if entry.metadata().unwrap().is_file() {
-                                match process_file(&livepeer, &entry.path()).await {
-                                    Ok(_) => {
-                                        println!("Successfully uploaded video {:?}", entry.path())
-                                    }
-                                    Err(e) => eprintln!("{}", e),
-                                };
-                            }
-                        }
-                    }
-                }
-            } else {
-                println!("Given path is a file");
-                match process_file(&livepeer, path).await {
-                    Ok(_) => println!("Succesfully uploaded video {:?}", path),
-                    Err(e) => eprintln!("{}", e),
-                };
-            }
-        }
-    }
+    handle_directory(&livepeer, path)
+        .await
+        .unwrap_or_else(|e| panic!("Error while handling directory: {}", e));
 
     println!("Successfully completed program...");
 }

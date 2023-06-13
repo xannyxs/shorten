@@ -115,12 +115,7 @@ pub async fn process_file(livepeer: &Livepeer, video_path: &Path) -> Result<(), 
 
     let playback_url = video_is_processed(livepeer, &parsed_body.asset.id).await?;
 
-    call_python_script(video_path, &playback_url).map_err(|_| {
-        Error::new(
-            ErrorKind::Interrupted,
-            "Something went wrong in the python script",
-        )
-    })?;
+    call_python_script(video_path, &playback_url)?;
 
     Ok(())
 }

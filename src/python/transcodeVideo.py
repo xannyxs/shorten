@@ -5,6 +5,7 @@ from os.path import basename
 import saveToDatabase
 import os
 from summarizeVideo import start_summary
+from utils import eprint
 
 
 def process_file(video_file_path: str, playbackUrl: str) -> None:
@@ -23,7 +24,7 @@ def process_file(video_file_path: str, playbackUrl: str) -> None:
 
 if __name__ == '__main__':
     if len(sys.argv) != 3:
-        print("Usage: python script.py video_file_path assetId")
+        eprint("Usage: python script.py video_file_path assetId")
         sys.exit(1)
 
     process_file(sys.argv[1], sys.argv[2])

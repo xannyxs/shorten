@@ -4,7 +4,7 @@ use std::process::Command;
 use std::str;
 
 pub fn call_python_script(video_path: &Path, asset_id: &str) -> io::Result<()> {
-    let script_path = "./src/python/transcodeVideo.py";
+    let script_path = "/shorten/src/python/transcodeVideo.py";
 
     let output = Command::new("python3")
         .arg(script_path)

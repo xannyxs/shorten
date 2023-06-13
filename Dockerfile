@@ -1,4 +1,4 @@
-FROM arm64v8/python:3.9.9-apache
+FROM arm64v8/python:3.9.9-slim-bullseye
 
 WORKDIR /shorten
 
@@ -14,7 +14,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Get the latest Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 COPY . /shorten

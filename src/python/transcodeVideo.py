@@ -19,7 +19,7 @@ def process_file(video_file_path: str, playbackUrl: str) -> None:
         with open(f'{temp_file_path}.txt') as file:
             summary_content = file.read()
 
-        saveToDatabase.save_to_database(video_file_path, summary_content)
+        saveToDatabase.save_to_database(video_file_path, playbackUrl, summary_content)
 
 
 if __name__ == '__main__':

@@ -103,21 +103,24 @@ pub async fn process_file(livepeer: &Livepeer, video_path: &Path) -> Result<(), 
         Err(e) => Err(Error::new(ErrorKind::Other, e)),
     };
 
-    if let Ok(parsed_body) = &parsed_body {
-        livepeer
-            .upload_content(video_path, &parsed_body.url)
-            .await
-            .map_err(|_| Error::new(ErrorKind::TimedOut, "Upload content failed"))?;
+    let parsed_body = match parsed_body {
+        Ok(parsed_body) => parsed_body,
+        Err(e) => return Err(e),
+    };
 
-        let playback_url = video_is_processed(livepeer, &parsed_body.asset.id).await?;
+    livepeer
+        .upload_content(video_path, &parsed_body.url)
+        .await
+        .map_err(|_| Error::new(ErrorKind::TimedOut, "Upload content failed"))?;
 
-        call_python_script(video_path, &playback_url).map_err(|_| {
-            Error::new(
-                ErrorKind::Interrupted,
-                "Something went wrong in the python script",
-            )
-        })?;
-    }
+    let playback_url = video_is_processed(livepeer, &parsed_body.asset.id).await?;
+
+    call_python_script(video_path, &playback_url).map_err(|_| {
+        Error::new(
+            ErrorKind::Interrupted,
+            "Something went wrong in the python script",
+        )
+    })?;
 
     Ok(())
 }

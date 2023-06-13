@@ -5,7 +5,7 @@ pub struct Asset {
     pub id: String,
     #[serde(rename = "playbackId")]
     pub playback_id: Option<String>,
-    #[serde(rename = "userID")]
+    #[serde(rename = "userId")]
     user_id: String,
     #[serde(rename = "createdAt")]
     created_at: u64,
@@ -35,6 +35,7 @@ struct Task {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Response {
     pub url: String,
+    #[serde(rename = "tusEndpoint")]
     tusendpoint: String,
     pub asset: Asset,
     task: Task,

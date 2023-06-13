@@ -54,7 +54,9 @@ async fn main() {
                             let entry = entry.unwrap();
                             if entry.metadata().unwrap().is_file() {
                                 match process_file(&livepeer, &entry.path()).await {
-                                    Ok(_) => println!("Succesfully uploaded video {:?}", path),
+                                    Ok(_) => {
+                                        println!("Successfully uploaded video {:?}", entry.path())
+                                    }
                                     Err(e) => eprintln!("{}", e),
                                 };
                             }
@@ -63,7 +65,7 @@ async fn main() {
                 }
             } else {
                 println!("Given path is a file");
-                match process_file(&livepeer, &path).await {
+                match process_file(&livepeer, path).await {
                     Ok(_) => println!("Succesfully uploaded video {:?}", path),
                     Err(e) => eprintln!("{}", e),
                 };

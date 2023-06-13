@@ -17,7 +17,7 @@ pub struct Response {
     video_spec: Option<VideoSpec>,
     #[serde(rename = "playbackId")]
     pub playback_id: String,
-    #[serde(rename = "playbackurl")]
+    #[serde(rename = "playbackUrl")]
     pub playback_url: Option<String>,
     #[serde(rename = "downloadUrl")]
     pub download_url: Option<String>,

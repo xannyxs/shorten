@@ -1,1 +1,1 @@
-0 */3 * * * /bin/bash -c "set -a && source /shorten/.env.local && set +a && /shorten/cmake-build/shorten /shorten/videosToUpload >> /var/log/cron.log 2>&1"
+30 3 * * * /bin/bash -c "set -a && source /shorten/.env.local && set +a && cargo run /shorten/videosToUpload >> /var/log/cron.log 2>&1"

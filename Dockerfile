@@ -9,12 +9,15 @@ RUN apt-get update && \
     ffmpeg \
     curl \
     cron \
+    build-essential \
+    pkg-config \
+    libssl-dev \
     bash && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Get the latest Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | bash -s -- -y
+RUN curl https://sh.rustup.rs -sSf | sh -s -- -y --profile minimal --default-toolchain stable
 ENV PATH="/root/.cargo/bin:${PATH}"
 
 COPY . /shorten

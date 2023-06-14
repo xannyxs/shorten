@@ -111,7 +111,12 @@ pub async fn process_file(livepeer: &Livepeer, video_path: &Path) -> Result<(), 
     livepeer
         .upload_content(video_path, &parsed_body.url)
         .await
-        .map_err(|_| Error::new(ErrorKind::TimedOut, "Upload content failed"))?;
+        .map_err(|e| {
+            Error::new(
+                ErrorKind::TimedOut,
+                format!("Upload content failed:\n {}", e),
+            )
+        })?;
 
     let playback_url = video_is_processed(livepeer, &parsed_body.asset.id).await?;
 

@@ -24,8 +24,8 @@ def save_to_gdrive(video_path: str, video_url: str, summary: str) -> None:
     empty_row = len(values_list) + 1
 
     sheet.update('A' + str(empty_row), video_path)
-    sheet.update('B' + str(empty_row), video_url)
-    sheet.update('C' + str(empty_row), summary)
+    sheet.update('D' + str(empty_row), video_url)
+    sheet.update('E' + str(empty_row), summary)
 
     print(f"{video_path} has been saved with the summary: {summary}")
 

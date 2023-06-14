@@ -1,0 +1,10 @@
+[file_locations]
+credentials = "/shorten/credentials.json"
+env_file = "/shorten/.env.local"
+
+[database]
+type = "GDrive" # Can be only be GDrive for now...
+
+[video]
+save_video = true
+codec = "" # Future feature

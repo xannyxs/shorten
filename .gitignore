@@ -8,6 +8,7 @@ lib/
 .idea
 .env.local
 credentials.json
+config.shorten.toml
 .ccls-cache
 
 # CMake

@@ -49,6 +49,7 @@ async fn main() {
     assert_argument_count(&args);
     assert_file_exists("./credentials.json");
     assert_file_exists("./.env.local");
+    assert_file_exists("./config.shorten.toml");
 
     let livepeer = get_livepeer_api_key();
     let path = Path::new(&args[1]);

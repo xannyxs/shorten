@@ -76,7 +76,7 @@ pub async fn process_file(livepeer: &Livepeer, video_path: &Path) -> Result<(), 
         Err(e) => Err(format!("Failed to get Livepeer URL: {}", e)),
         Ok(response) => match response.status() {
             reqwest::StatusCode::OK => {
-                println!("OK");
+                println!("Getting Livepeer URL...");
                 response
                     .text()
                     .await

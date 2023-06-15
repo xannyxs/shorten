@@ -1,9 +1,10 @@
+use std::io::{Error, ErrorKind};
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE};
 use reqwest::Response;
 use serde_json::{json, Value};
-use std::fs::File;
-use std::io::Read;
+use tokio::fs::File as tokFile;
 use std::path::Path;
+use tokio_util::codec::{BytesCodec, FramedRead};
 
 const REQUEST_UPLOAD: &str = "https://livepeer.com/api/asset/request-upload";
 const EXPORT_ASSET: &str = "https://livepeer.com/api/asset/";
@@ -39,23 +40,19 @@ impl Livepeer {
         &self,
         video_path: &Path,
         asset_url: &String,
-    ) -> Result<Response, reqwest::Error> {
-        let mut buf = Vec::new();
-
-        match File::open(video_path) {
-            Err(e) => eprintln!("{}", e),
-            Ok(mut file) => {
-                file.read_to_end(&mut buf).expect("Could not open file");
-            }
-        }
+    ) -> Result<Response, Error> {
+        let file = tokFile::open(video_path).await?;
+        let stream = FramedRead::new(file, BytesCodec::new());
 
         self.client
             .put(asset_url)
             .header("Content-Type", "video/mp4")
-            .body(buf)
+            .body(reqwest::Body::wrap_stream(stream))
             .send()
             .await
+            .map_err(|e| Error::new(ErrorKind::Other, e.to_string()))
     }
+
 
     pub async fn get_livepeer_url(&self, video_name: &str) -> Result<Response, reqwest::Error> {
         let json_body = json!({ "name": video_name });

@@ -7,7 +7,7 @@ use std::io::{Error, ErrorKind};
 use std::path::Path;
 use tokio::time::Duration;
 
-const MAX_TIMEOUT: i32 = 600;
+const MAX_TIMEOUT: i32 = 1500;
 const SLEEP_INTERVAL: i32 = 20;
 
 async fn video_is_processed(livepeer: &Livepeer, asset_id: &String) -> Result<String, Error> {

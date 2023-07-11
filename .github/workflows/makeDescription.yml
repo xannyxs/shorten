@@ -17,6 +17,11 @@ jobs:
         with:
           python-version: "3.9"
 
+      - name: Setup ffmpeg
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg libx264-dev
+
       - name: Create and activate virtual environment
         run: |
           python -m venv .venv

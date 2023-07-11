@@ -30,7 +30,7 @@ jobs:
       - name: Run Python script
         run: |
           source .venv/bin/activate
-          python3 transcodeVideo.py
+          python3 ./src/python/transcodeVideo.py
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}

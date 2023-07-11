@@ -33,5 +33,5 @@ jobs:
           python3 ./src/python/transcodeVideo.py
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
-          CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
-          LIVEPEER_API_KEY: ${{ secrets.LIVEPEER_API_KEY }}
+          CHATGPT_API_KEY: ${{ secrets.CHATGPT_APT_KEY }}
+          LIVEPEER_API_KEY: ${{ secrets.LIVEPEER_APT_KEY }}

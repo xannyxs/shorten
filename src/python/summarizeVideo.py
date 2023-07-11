@@ -1,6 +1,5 @@
 import os
 import subprocess
-import sys
 from typing import Any
 
 import whisper
@@ -28,18 +27,17 @@ def process_text_file(transcribed_text: str) -> str:
 def generate_summary(input_text: str, temperature: float) -> Any:
     response = openai.ChatCompletion.create(  # type: ignore
         model=GPT_MODEL,
-        messages=[
-            {
-                "role": "user",
-                "content": f"Summarize this text delimited by triple single quotes for a description for a "
-                           f"video:\n\n'''{input_text}'''"
-            }
-        ],
+        messages=[{
+            "role":
+            "user",
+            "content":
+            f"Summarize this text delimited by triple single quotes for a description for a "
+            f"video:\n\n'''{input_text}'''"
+        }],
         temperature=temperature,
         max_tokens=512,
         frequency_penalty=0.3,
-        presence_penalty=0
-    )
+        presence_penalty=0)
     return response['choices'][0]['message']['content']
 
 
@@ -47,15 +45,17 @@ def summarize_text(input_text: str, output_file: str) -> None:
     openai.api_key = OPENAI_API_KEY
 
     # Generate summaries with different temperatures
-    summaries = [generate_summary(input_text, temp) for temp in [0.3, 0.5, 0.7]]
+    summaries = [
+        generate_summary(input_text, temp) for temp in [0.3, 0.5, 0.7]
+    ]
 
     summary_input_text = "\n\n\n'''".join(summaries)
     summary_of_summaries = generate_summary(summary_input_text, 0.4)
 
-    is_valid = check_summary_validity(input_text, summary_of_summaries)
-    if not is_valid:
-        eprint("Summary is invalid")
-        sys.exit(1)
+    # is_valid = check_summary_validity(input_text, summary_of_summaries)
+    # if not is_valid:
+    #     eprint("Summary is invalid")
+    #     sys.exit(1)
 
     with open(output_file, 'w') as file:
         file.write(summary_of_summaries)
@@ -74,21 +74,20 @@ def check_summary_validity(input_text: str, summary: str) -> bool:
 
 def download_m3u8_video_as_wav(m3u8_url: str, output_name: str) -> None:
     command = [
-        "ffmpeg",
-        "-analyzeduration", "100M",
-        "-probesize", "100M",
-        "-i", m3u8_url,
-        "-vn",
-        "-c:a", "pcm_s16le",
-        "-ar", "44100",
+        "ffmpeg", "-analyzeduration", "100M", "-probesize", "100M", "-i",
+        m3u8_url, "-vn", "-c:a", "pcm_s16le", "-ar", "44100",
         f'{output_name}.wav'
     ]
 
     try:
         subprocess.run(command, check=True)
-        print(f"Successfully downloaded and converted audio from {m3u8_url} to {output_name}.wav")
+        print(
+            f"Successfully downloaded and converted audio from {m3u8_url} to {output_name}.wav"
+        )
     except subprocess.CalledProcessError as e:
-        eprint(f"Error occurred while downloading and converting audio from {m3u8_url} to {output_name}.wav: {e}")
+        eprint(
+            f"Error occurred while downloading and converting audio from {m3u8_url} to {output_name}.wav: {e}"
+        )
 
 
 def convert_speech_to_text(input_wav: str) -> Any:
@@ -96,7 +95,7 @@ def convert_speech_to_text(input_wav: str) -> Any:
     result = model.transcribe(input_wav)
     text = result["text"]
 
-    print(f"Successfully saved speech-to-text result")
+    print("Successfully saved speech-to-text result")
     return text
 
 

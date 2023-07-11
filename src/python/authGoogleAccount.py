@@ -12,7 +12,7 @@ def login_drive() -> Optional[Any]:
 
 # Hardcoded path to credentials.json
 def login_gspread() -> Client:
-    return gspread.service_account("/shorten/credentials.json")
+    return gspread.service_account("./credentials.json")
 
 
 def open_sheet(spread_id: str) -> Worksheet:

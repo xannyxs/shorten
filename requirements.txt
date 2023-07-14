@@ -4,3 +4,4 @@ livepeersdk
 mypy
 openai
 openai-whisper
+sentence-transformers

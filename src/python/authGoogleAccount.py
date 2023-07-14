@@ -1,5 +1,6 @@
 import gspread
 import os
+import json
 from google.oauth2.service_account import Credentials
 from googleapiclient import discovery
 from gspread import Client, Spreadsheet, Worksheet
@@ -12,7 +13,14 @@ from typing import Any, Optional
 
 # Hardcoded path to credentials.json
 def login_gspread() -> Client:
-    return gspread.service_account_from_dict(os.getenv('GCP_CREDENTIALS'))
+    json_credentials = os.getenv('GCP_CREDENTIALS')
+
+    if json_credentials is None:
+        print('Environment variable not found')
+    else:
+        credentials = json.loads(json_credentials)
+
+    return gspread.service_account_from_dict(credentials)
 
 
 def open_sheet(spread_id: str) -> Worksheet:

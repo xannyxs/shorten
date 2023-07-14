@@ -26,11 +26,13 @@ def save_to_database(videoID: str, summary: str) -> None:
 
     try:
         row_number = cleaned_video_ids.index(videoID.lower()) + 1
+        print(row_number)
     except ValueError:
         print(f"No row found for video ID {videoID}")
         return
 
-    if descriptions[row_number - 1].strip() != '':
+    print(descriptions)
+    if row_number <= len(descriptions) and descriptions[row_number - 1].strip() != '':
         print(
             f"The description for video ID {videoID} has already been filled.")
         return

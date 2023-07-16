@@ -31,7 +31,7 @@ def generate_summary(input_text: str, temperature: float) -> Any:
             "role":
             "user",
             "content":
-            f"Summarize this text delimited by triple single quotes for a description for a "
+            f"You have experience in the crypto field. Summarize this text delimited by triple single quotes for a description for a "
             f"video:\n\n'''{input_text}'''"
         }],
         temperature=temperature,

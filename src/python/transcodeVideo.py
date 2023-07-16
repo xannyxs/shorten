@@ -24,7 +24,8 @@ def getAssets() -> List[Any]:
     assets: List[Any] = []
 
     while len(assets) < 50:
-        response = requests.get(f'{BASE_URL}/asset?limit=100&cursor={nextPage}', headers=headers)
+        response = requests.get(
+            f'{BASE_URL}/asset?limit=100&cursor={nextPage}', headers=headers)
         items: Any = response.json()
         for asset in items:
             if len(assets) == 50:

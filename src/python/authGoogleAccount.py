@@ -1,17 +1,9 @@
 import gspread
 import os
 import json
-from google.oauth2.service_account import Credentials
-from googleapiclient import discovery
 from gspread import Client, Spreadsheet, Worksheet
-from typing import Any, Optional
-
-# def login_drive() -> Optional[Any]:
-# creds = Credentials.from_service_account_file("credentials.json")
-# return discovery.build('drive', 'v3', credentials=creds)
 
 
-# Hardcoded path to credentials.json
 def login_gspread() -> Client:
     json_credentials = os.getenv('GCP_CREDENTIALS')
 

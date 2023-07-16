@@ -25,7 +25,7 @@ def process_text_file(transcribed_text: str) -> str:
 
 
 def generate_summary(input_text: str, temperature: float) -> Any:
-    response = openai.ChatCompletion.create(  # type: ignore
+    response = openai.ChatCompletion.create(
         model=GPT_MODEL,
         messages=[{
             "role":

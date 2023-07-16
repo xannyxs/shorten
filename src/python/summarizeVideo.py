@@ -91,8 +91,14 @@ def download_m3u8_video_as_wav(m3u8_url: str, output_name: str) -> None:
 
 
 def convert_speech_to_text(input_wav: str) -> Any:
-    model = whisper.load_model("base")
-    result = model.transcribe(input_wav)
+    audio = whisper.load_audio(input_wav)
+
+    model = whisper.load_model("small")
+    mel = whisper.log_mel_spectrogram(audio).to(model.device)
+    _, probs = model.detect_language(mel)
+
+    options = whisper.DecodingOptions()
+    result = whisper.decode(model, mel, options)
     text = result["text"]
 
     print("Successfully saved speech-to-text result")

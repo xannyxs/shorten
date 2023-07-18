@@ -17,7 +17,7 @@ def clean_video_ids(video_ids: list[str]) -> list[str]:
     return [re.sub(pattern, '', id).lower() for id in video_ids]
 
 
-def save_to_database(videoID: str, summary: str) -> None:
+def is_video_id_valid(videoID: str) -> bool:
     sheet = authGoogleAccount.open_sheet(str(os.environ['SHEET_ID']))
 
     video_ids = sheet.col_values(get_position(ID_COLUMN))
@@ -26,16 +26,29 @@ def save_to_database(videoID: str, summary: str) -> None:
 
     try:
         row_number = cleaned_video_ids.index(videoID.lower()) + 1
-        print(row_number)
     except ValueError:
         print(f"No row found for video ID {videoID}")
-        return
+        return False
 
-    print(descriptions)
     if row_number <= len(descriptions) and descriptions[row_number -
                                                         1].strip() != '':
         print(
             f"The description for video ID {videoID} has already been filled.")
+        return False
+
+    return True
+
+
+def save_to_database(videoID: str, summary: str) -> None:
+    sheet = authGoogleAccount.open_sheet(str(os.environ['SHEET_ID']))
+
+    video_ids = sheet.col_values(get_position(ID_COLUMN))
+    cleaned_video_ids = clean_video_ids(video_ids)
+
+    try:
+        row_number = cleaned_video_ids.index(videoID.lower()) + 1
+    except ValueError:
+        print(f"No row found for video ID {videoID}")
         return
 
     sheet.update(DESCRIPTION_COLUMN + str(row_number), summary)

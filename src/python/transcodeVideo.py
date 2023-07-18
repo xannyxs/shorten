@@ -55,6 +55,10 @@ def process_file(videoName: str, playbackUrl: str) -> None:
     with tempfile.TemporaryDirectory() as tempdir:
         temp_file_path = os.path.join(tempdir, basename(playbackUrl))
 
+        print('Checking if videoID isa valid...')
+        if saveToDatabase.is_video_id_valid(videoName) is False:
+            return
+
         print(f'Summarizing video in {temp_file_path}...')
         start_summary(playbackUrl, temp_file_path)
         print('Created summary...')

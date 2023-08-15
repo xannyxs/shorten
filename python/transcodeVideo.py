@@ -11,10 +11,6 @@ API_KEY = os.getenv('LIVEPEER_API_KEY')
 if not API_KEY:
     raise EnvironmentError("LIVEPEER_API_KEY environment variable not set")
 
-EVENT = os.getenv('EVENT')
-if not EVENT:
-    raise EnvironmentError("EVENT environment variable not set")
-
 
 def process_file(playbackUrl: str) -> str:
     with tempfile.TemporaryDirectory() as tempdir:

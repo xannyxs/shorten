@@ -59,6 +59,8 @@ def process_file(videoName: str, playbackUrl: str) -> None:
         if saveToDatabase.is_video_id_valid(videoName) is False:
             return
 
+        speakerName = getName()
+
         print(f'Summarizing video in {temp_file_path}...')
         start_summary(playbackUrl, temp_file_path)
         print('Created summary...')

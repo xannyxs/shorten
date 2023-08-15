@@ -1,13 +1,11 @@
-name: Run Python script
+name: Process Videos and Generate Descriptions
 
-on:
-  push:
-    branches:
-      - master
+# Needs to activated manually
 
 jobs:
-  build:
+  preprocess:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -25,6 +23,38 @@ jobs:
       - name: Create and activate virtual environment
         run: |
           python -m venv .venv
+
+      - name: Install dependencies
+        run: |
+          source .venv/bin/activate
+          pip install -r requirements.txt
+
+      - name: List batches of files without description
+        id: list-files
+        run: echo "::set-output name=batches::$(python ./python/workflow/list_files_without_description.py)"
+
+      - name: Set Matrix
+        id: set-matrix
+        run: echo "::set-output name=matrix::${{ steps.list-files.outputs.batches }}"
+
+  process_descriptions:
+    needs: preprocess
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        batch: ${{fromJson(needs.preprocess.outputs.matrix)}}
+    steps:
+      - name: Checkout repositories
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Create and activate virtual environment
+        run: |
+          python -m venv .venv
           source .venv/bin/activate
 
       - name: Install dependencies
@@ -32,12 +62,48 @@ jobs:
           source .venv/bin/activate
           pip install -r requirements.txt
 
-      - name: Run Python script
+      - name: Generate descriptions for a batch of files
         run: |
           source .venv/bin/activate
-          python3 ./python/transcodeVideo.py
+          for file in ${{ matrix.batch }}
+          do
+            python3 ./python/transcodeVideo.py $file
+          done
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
           LIVEPEER_API_KEY: ${{ secrets.LIVEPEER_API_KEY }}
           GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
+          EVENT: ${{ secrets.EVENT }}
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install Prettier
+        run: npm install prettier
+
+      - name: Run Prettier using npm script
+        run: npm run prettier:fix
+
+      - name: Configure git user
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+
+      - name: Commit changes
+        run: |
+          git add -A
+          git commit -m "Automatically generated video descriptions and formatted with Prettier" || echo "No changes to commit"
+
+      - name: Push changes
+        run: git push
+
+      - name: Create PR
+        uses: repo-sync/pull-request@v2
+        with:
+          source_branch: ''
+          destination_branch: "main"
+          destination_repo: "streamethorg/streameth-platform"
+          github_token: ${{ secrets.GITHUB_TOKEN }}

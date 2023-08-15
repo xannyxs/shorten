@@ -18,14 +18,14 @@ def clean_video_ids(video_ids: list[str]) -> list[str]:
     return [re.sub(pattern, '', id).lower() for id in video_ids]
 
 
-def get_name(videoID: str) -> str:
-    sheet = authGoogleAccount.open_sheet(str(os.environ['SHEET_ID']))
-
-    video_ids = sheet.col_values(get_position(ID_COLUMN))
-    cleaned_video_ids = clean_video_ids(video_ids)
-    speakers = sheet.col_values(get_position(NAME_COLUMN))
-
-    return speakers
+# def get_name(videoID: str) -> str:
+#     sheet = authGoogleAccount.open_sheet(str(os.environ['SHEET_ID']))
+#
+#     video_ids = sheet.col_values(get_position(ID_COLUMN))
+#     cleaned_video_ids = clean_video_ids(video_ids)
+#     speakers = sheet.col_values(get_position(NAME_COLUMN))
+#
+#     return speakers
 
 
 def is_video_id_valid(videoID: str) -> bool:

@@ -3,7 +3,7 @@ name: Run Python script
 on:
   push:
     branches:
-      - FtC
+      - master
 
 jobs:
   build:
@@ -15,7 +15,7 @@ jobs:
       - name: Set up Python 3.9
         uses: actions/setup-python@v2
         with:
-          python-version: "3.9"
+          python-version: 3.9
 
       - name: Setup ffmpeg
         run: |
@@ -35,10 +35,9 @@ jobs:
       - name: Run Python script
         run: |
           source .venv/bin/activate
-          python3 ./src/python/transcodeVideo.py
+          python3 ./python/transcodeVideo.py
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
           LIVEPEER_API_KEY: ${{ secrets.LIVEPEER_API_KEY }}
           GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
-

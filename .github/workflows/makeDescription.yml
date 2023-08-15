@@ -33,7 +33,10 @@ jobs:
 
       - name: List batches of files without description
         id: list-files
-        run: echo "::set-output name=batches::$(python ./python/workflow/list_files_without_description.py)"
+        run: |
+          batches=$(python ./python/workflow/list_files_without_description.py)
+          echo "Batches: $batches"
+          echo "::set-output name=batches::$batches"
 
       - name: Set Matrix
         id: set-matrix
@@ -45,6 +48,7 @@ jobs:
     strategy:
       matrix:
         batch: ${{fromJson(needs.preprocess.outputs.matrix)}}
+
     steps:
       - name: Checkout repositories
         uses: actions/checkout@v2
@@ -80,7 +84,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
+          node-version: 18
 
       - name: Install Prettier
         run: npm install prettier

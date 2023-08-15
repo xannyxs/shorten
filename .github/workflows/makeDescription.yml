@@ -1,6 +1,8 @@
 name: Process Videos and Generate Descriptions
 
-# Needs to activated manually
+on:
+  push:
+    branches: [master]
 
 jobs:
   preprocess:

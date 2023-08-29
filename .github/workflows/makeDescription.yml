@@ -20,8 +20,8 @@ jobs:
         uses: GuillaumeFalourd/clone-github-repo-action@v2.1
         with:
           depth: 1
-          owner: 'streamethorg'
-          repository: 'streameth-platform'
+          owner: "streamethorg"
+          repository: "streameth-platform"
 
       - name: Setup ffmpeg
         run: |
@@ -37,7 +37,6 @@ jobs:
         run: |
           batches=$(python ./python/workflow/list_files_without_description.py)
           echo "::set-output name=matrix::$batches"
-      
 
   process_descriptions:
     needs: preprocess
@@ -52,9 +51,12 @@ jobs:
         with:
           python-version: 3.9
 
-      # - name: Print Matrix
-      #   run: |
-      #     echo ${{ needs.preprocess.outputs.matrix }}
+      - name: Clone GuillaumeFalourd/poc-github-actions PUBLIC repository
+        uses: GuillaumeFalourd/clone-github-repo-action@v2.1
+        with:
+          depth: 1
+          owner: "streamethorg"
+          repository: "streameth-platform"
 
       - name: Create and activate virtual environment
         run: |
@@ -71,7 +73,7 @@ jobs:
           source .venv/bin/activate
           for file in ${{ matrix.batches }}
           do
-            python3 ./python/transcodeVideo.py $file
+            python3 ./python/transcodeVideo.py ./streameth-platform/data/sessions/berlin_2022/$file
           done
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}

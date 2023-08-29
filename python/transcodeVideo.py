@@ -1,24 +1,24 @@
 import sys
 import json
-import tempfile
+from tempfile import TemporaryDirectory
 import os
 
 from os.path import basename
-from summarizeVideo import start_summary
+# from summarizeVideo import start_summary
 
-BASE_URL = 'https://livepeer.com/api'
-API_KEY = os.getenv('LIVEPEER_API_KEY')
-if not API_KEY:
-    raise EnvironmentError("LIVEPEER_API_KEY environment variable not set")
+# BASE_URL = 'https://livepeer.com/api'
+# API_KEY = os.getenv('LIVEPEER_API_KEY')
+# if not API_KEY:
+#     raise EnvironmentError("LIVEPEER_API_KEY environment variable not set")
 
 
 def process_file(playbackUrl: str) -> str:
-    with tempfile.TemporaryDirectory() as tempdir:
+    with TemporaryDirectory() as tempdir:
         temp_file_path = os.path.join(tempdir, basename(playbackUrl))
 
         print(f'Summarizing video in {temp_file_path}...')
-        start_summary(playbackUrl, temp_file_path)
-        print('Created summary...')
+        # start_summary(playbackUrl, temp_file_path)
+        # print('Created summary...')
 
         with open(f'{temp_file_path}.txt') as file:
             summary_content = file.read()
@@ -27,15 +27,19 @@ def process_file(playbackUrl: str) -> str:
 
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3:
+    if len(sys.argv) != 2:
         raise ValueError("Usage: python3 transcodeVideo.py JsonFile")
 
-    with open(sys.argv[2], 'r') as json_file:
-        data = json.load(json_file)
+    print("First arg: ", sys.argv[1])
 
-    if 'videoUrl' in data and 'name' in data:
-        description = process_file(data['videoUrl'])
-        data['gpt_description'] = description
+    file_batch = json.loads(sys.argv[1])
+    for file in file_batch:
+        with open(file, 'r') as json_file:
+            data = json.load(json_file)
 
-        with open(sys.argv[2], 'w') as json_file:
-            json.dump(data, json_file, indent=4)
+        if 'videoUrl' in data and 'name' in data:
+            description = process_file(data['videoUrl'])
+            data['gpt_description'] = description
+
+            with open(sys.argv[2], 'w') as json_file:
+                json.dump(data, json_file, indent=4)

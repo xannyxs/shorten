@@ -1,6 +1,5 @@
 import json
 import glob
-import os
 from typing import List
 
 

@@ -23,10 +23,10 @@ jobs:
           owner: "streamethorg"
           repository: "streameth-platform"
 
-      - name: Setup ffmpeg
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg libx264-dev
+      # - name: Setup ffmpeg
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y ffmpeg libx264-dev
 
       - name: Create and activate virtual environment
         run: |
@@ -36,14 +36,15 @@ jobs:
         id: list-files
         run: |
           batches=$(python ./python/workflow/list_files_without_description.py)
-          echo "::set-output name=matrix::$batches"
+          echo "matrix=$batches" >> "$GITHUB_OUTPUT"
 
   process_descriptions:
     needs: preprocess
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        batch: ${{fromjson(needs.preprocess.outputs.matrix)}}
+        files: ${{fromJson(needs.preprocess.outputs.matrix)}}
+
 
     steps:
       - uses: actions/checkout@v3
@@ -63,18 +64,14 @@ jobs:
           python -m venv .venv
           source .venv/bin/activate
 
-      - name: Install dependencies
-        run: |
-          source .venv/bin/activate
-          pip install -r requirements.txt
+      # - name: Install dependencies
+      #   run: |
+      #     source .venv/bin/activate
+      #     pip install -r requirements.txt
 
       - name: Generate descriptions for a batch of files
         run: |
-          source .venv/bin/activate
-          for file in ${{ matrix.batches }}
-          do
-            python3 ./python/transcodeVideo.py ./streameth-platform/data/sessions/berlin_2022/$file
-          done
+          python3 ./python/transcodeVideo.py "${{ matrix.files }}"
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
@@ -88,14 +85,15 @@ jobs:
 
       - name: Change directory
         run: |
-          ls -l
           cd streameth-platform
 
       - name: Install Prettier
         run: npm install prettier
 
       - name: Run Prettier using npm script
-        run: npm run prettier:fix
+        run: |
+          npm run
+          # npm run prettier:fix
 
       - name: Configure git user
         run: |

@@ -7,15 +7,21 @@ on:
 jobs:
   preprocess:
     runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.list-files.outputs.matrix }}
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: 3.9
+
+      - name: Clone GuillaumeFalourd/poc-github-actions PUBLIC repository
+        uses: GuillaumeFalourd/clone-github-repo-action@v2.1
+        with:
+          depth: 1
+          owner: 'streamethorg'
+          repository: 'streameth-platform'
 
       - name: Setup ffmpeg
         run: |
@@ -26,37 +32,29 @@ jobs:
         run: |
           python -m venv .venv
 
-      - name: Install dependencies
-        run: |
-          source .venv/bin/activate
-          pip install -r requirements.txt
-
-      - name: List batches of files without description
+      - name: List batches of files without description and set matrix
         id: list-files
         run: |
           batches=$(python ./python/workflow/list_files_without_description.py)
-          echo "Batches: $batches"
-          echo "::set-output name=batches::$batches"
-
-      - name: Set Matrix
-        id: set-matrix
-        run: echo "::set-output name=matrix::${{ steps.list-files.outputs.batches }}"
+          echo "::set-output name=matrix::$batches"
+      
 
   process_descriptions:
     needs: preprocess
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        batch: ${{fromJson(needs.preprocess.outputs.matrix)}}
+        batch: ${{fromjson(needs.preprocess.outputs.matrix)}}
 
     steps:
-      - name: Checkout repositories
-        uses: actions/checkout@v2
-
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: 3.9
+
+      # - name: Print Matrix
+      #   run: |
+      #     echo ${{ needs.preprocess.outputs.matrix }}
 
       - name: Create and activate virtual environment
         run: |
@@ -82,7 +80,7 @@ jobs:
           GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Set up Node.js
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 18
 
@@ -105,10 +103,11 @@ jobs:
       - name: Push changes
         run: git push
 
-      - name: Create PR
-        uses: repo-sync/pull-request@v2
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
         with:
-          source_branch: ''
-          destination_branch: "main"
-          destination_repo: "streamethorg/streameth-platform"
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          commit-message: Automated description
+          delete-branch: true
+          labels: automated pr
+          token: ${{ secrets.GITHUB_TOKEN }}

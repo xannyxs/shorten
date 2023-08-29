@@ -84,6 +84,9 @@ jobs:
         with:
           node-version: 18
 
+      - name: Change directory
+        run: cd streameth-platform
+
       - name: Install Prettier
         run: npm install prettier
 

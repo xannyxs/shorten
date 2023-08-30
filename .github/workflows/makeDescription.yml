@@ -71,14 +71,17 @@ jobs:
         run: |
           python3 ./python/transcodeVideo.py "${{needs.preprocess.outputs.matrix}}" ${{ matrix.files.batchID }}
         env:
-          SHEET_ID: ${{ secrets.SHEET_ID }}
           CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
-          GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
+      
+      - name: Change directory
+        run: |
+          cd streameth-platform
+      
 
       - name: Change directory
         run: |
@@ -101,7 +104,7 @@ jobs:
         run: |
           git add -A
           git commit -m "Automatically generated video descriptions and formatted with Prettier" || echo "No changes to commit"
-      #
+      
       - name: Push changes
         run: git push
 

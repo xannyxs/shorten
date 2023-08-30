@@ -53,19 +53,19 @@ jobs:
           owner: "streamethorg"
           repository: "streameth-platform"
 
-      - name: Setup ffmpeg
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg libx264-dev
+      # - name: Setup ffmpeg
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install -y ffmpeg libx264-dev
 
       - name: Create and activate virtual environment
         run: |
           python -m venv .venv
           source .venv/bin/activate
 
-      - name: Install dependencies
-        run: |
-          pip install -r requirements.txt
+      # - name: Install dependencies
+      #   run: |
+      #     pip install -r requirements.txt
 
       - name: Generate descriptions for a batch of files
         run: |
@@ -75,41 +75,41 @@ jobs:
           CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
           GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
+      # - name: Set up Node.js
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 18
+      #
+      # - name: Change directory
+      #   run: |
+      #     cd streameth-platform
+      #
+      # - name: Install Prettier
+      #   run: npm install prettier
+      #
+      # - name: Run Prettier using npm script
+      #   run: |
+      #     npm run
+      #     # npm run prettier:fix
 
-      - name: Change directory
-        run: |
-          cd streameth-platform
-
-      - name: Install Prettier
-        run: npm install prettier
-
-      - name: Run Prettier using npm script
-        run: |
-          npm run
-          # npm run prettier:fix
-
-      - name: Configure git user
-        run: |
-          git config user.name "GitHub Action"
-          git config user.email "action@github.com"
-
-      - name: Commit changes
-        run: |
-          git add -A
-          git commit -m "Automatically generated video descriptions and formatted with Prettier" || echo "No changes to commit"
-
-      - name: Push changes
-        run: git push
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          branch: main
-          commit-message: Automated description
-          delete-branch: true
-          labels: automated pr
-          token: ${{ secrets.GITHUB_TOKEN }}
+      # - name: Configure git user
+      #   run: |
+      #     git config user.name "GitHub Action"
+      #     git config user.email "action@github.com"
+      #
+      # - name: Commit changes
+      #   run: |
+      #     git add -A
+      #     git commit -m "Automatically generated video descriptions and formatted with Prettier" || echo "No changes to commit"
+      #
+      # - name: Push changes
+      #   run: git push
+      #
+      # - name: Create Pull Request
+      #   uses: peter-evans/create-pull-request@v5
+      #   with:
+      #     branch: main
+      #     commit-message: Automated description
+      #     delete-branch: true
+      #     labels: automated pr
+      #     token: ${{ secrets.GITHUB_TOKEN }}

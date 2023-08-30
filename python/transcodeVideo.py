@@ -10,10 +10,11 @@ from summarizeVideo import start_summary
 logging.basicConfig(level=logging.INFO)
 
 
-def process_file(playbackUrl: str) -> str:
+def process_file(playbackUrl: str, playbackId: str) -> str:
     with TemporaryDirectory() as tempdir:
-        temp_file_path = join(tempdir, basename(playbackUrl))
+        temp_file_path = join(tempdir, basename(playbackId))
 
+        print(f'playbackUrl is: {playbackUrl}')
         print(f'Summarizing video in {temp_file_path}...')
         start_summary(playbackUrl, temp_file_path)
         print('Created summary...')
@@ -56,7 +57,7 @@ def main(raw_json_str: str, batchID: int) -> None:
 
         target_batch = None
         for batch in sanitized_json:
-            if batch.get('batchID') == batchID:
+            if str(batch.get('batchID')) == str(batchID):
                 target_batch = batch
                 break
 
@@ -68,8 +69,10 @@ def main(raw_json_str: str, batchID: int) -> None:
             with open(file, 'r') as json_file:
                 data = json.load(json_file)
 
-            if 'videoUrl' in data and 'name' in data:
-                description = process_file(data['videoUrl'])
+                print(data)
+            if 'videoUrl' in data and 'name' in data and 'playbackId' in data:
+                description = process_file(
+                    data['videoUrl'], data['playbackId'])
                 data['gpt_description'] = description
 
                 with open(file, 'w') as json_file:

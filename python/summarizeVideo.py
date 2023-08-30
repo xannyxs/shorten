@@ -91,7 +91,7 @@ def download_m3u8_video_as_wav(m3u8_url: str, output_name: str) -> None:
 
 
 def convert_speech_to_text(input_wav: str) -> Any:
-    model = whisper.load_model("medium")
+    model = whisper.load_model("small.en")
     result = model.transcribe(input_wav)
     text = result["text"]
 

@@ -65,16 +65,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          source .venv/bin/activate
           pip install -r requirements.txt
 
       - name: Generate descriptions for a batch of files
         run: |
-          python3 ./python/transcodeVideo.py "${{needs.preprocess.outputs.matrix}}" ${{ matrix.files.batchID }} ${{ matrix.files.files }}
+          python3 ./python/transcodeVideo.py "${{needs.preprocess.outputs.matrix}}" ${{ matrix.files.batchID }}
         env:
           SHEET_ID: ${{ secrets.SHEET_ID }}
           CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
-          LIVEPEER_API_KEY: ${{ secrets.LIVEPEER_API_KEY }}
           GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Set up Node.js

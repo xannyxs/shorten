@@ -73,46 +73,44 @@ jobs:
         env:
           CHATGPT_API_KEY: ${{ secrets.CHATGPT_API_KEY }}
 
+      - name: Make decoy text file
+        run: echo "Hello world" > aTextFile.txt
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
-      
-      - name: Change directory
-        run: |
-          cd streameth-platform
-      
-
-      - name: Change directory
-        run: |
-          cd streameth-platform
 
       - name: Install Prettier
-        run: npm install prettier
+        run: npm --prefix ./streameth-platform install prettier
 
       - name: Run Prettier using npm script
         run: |
-          cat package.json
-          # npm run prettier:fix
+          npm --prefix ./streameth-platform run prettier:fix
 
       - name: Configure git user
         run: |
-          git config user.name "GitHub Action"
-          git config user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
 
-      - name: Commit changes
+      - name: Commit and Push changes in streameth-platform directory
+        working-directory: ./streameth-platform
         run: |
+          git checkout -b automatedDescriptions
           git add -A
-          git commit -m "Automatically generated video descriptions and formatted with Prettier" || echo "No changes to commit"
-      
-      - name: Push changes
-        run: git push
+          git commit -m "Automatically generated video descriptions and formatted with Prettier"
+          git push --set-upstream origin automatedDescriptions
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5
         with:
-          branch: main
-          commit-message: Automated description
+          title: "Automated PR of AI made descriptions"
+          branch: automatedDescriptions
+          base: main
+          path: ./streameth-platform
+          committer: GitHub <noreply@github.com>
+          author: ${{ github.actor }} <${{ github.actor }}@users.noreply.github.com>
+          commit-message: Automated description made by Shorten
           delete-branch: true
           labels: automated pr
           token: ${{ secrets.GITHUB_TOKEN }}
